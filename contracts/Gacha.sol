@@ -59,6 +59,7 @@ contract Gacha is VRFConsumerBaseV2, ERC721URIStorage {
         uint32 _callbackGasLimit,
         string[12] memory _tokenURI
     ) VRFConsumerBaseV2(coordinator) ERC721("Item", "ITM") {
+        // address addr_coordinator = address(coordinator);
         vrfCoordinator = VRFCoordinatorV2Interface(coordinator);
         owner = msg.sender;
         casePrice = price;
@@ -127,8 +128,9 @@ contract Gacha is VRFConsumerBaseV2, ERC721URIStorage {
         return casePrice;
     }
 
-    function getNumCase(address idx) public view returns (uint256) {
-        return numCase[idx];
+    function getNumCase(uint160 idx) public view returns (uint256) {
+        address add_idx = address(idx);
+        return numCase[add_idx];
     }
 
     function getItem() public view returns (string[12] memory) {
