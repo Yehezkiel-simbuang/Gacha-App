@@ -1,9 +1,5 @@
 const { network, ethers, deployments } = require("hardhat");
 const { assert, expect } = require("chai");
-const { NetworkConfig } = require("../helper-hardhat-config");
-const { BigNumber } = require("ethers");
-const { resolve } = require("path");
-const { rejects } = require("assert");
 
 !network.config.chainId == 31337
     ? describe.skip
@@ -45,7 +41,7 @@ const { rejects } = require("assert");
                     value: ethers.utils.parseEther("1"),
                 });
                 numCaseResponse = await gachaContract.getNumCase(
-                    accounts[0].address
+                    accounts[0].address.toString()
                 );
                 assert.equal(numCaseResponse, 1);
             });
@@ -77,9 +73,11 @@ const { rejects } = require("assert");
                     ),
                     accounts[0].address
                 );
+                // console.log(typeof (accounts[0].address.toInt()));
                 numCaseResponse = await gachaContract.getNumCase(
-                    accounts[0].address
+                    accounts[0].address.toString()
                 );
+                console.log(Number(numCaseResponse._hex));
                 assert.equal(numCaseResponse, 1);
             });
         });
@@ -92,6 +90,7 @@ const { rejects } = require("assert");
                             const TokenURI = await gachaContract.tokenURI("0");
                             const TokenCounter = await gachaContract.getTokenCounter();
                             console.log(TokenURI);
+                            console.log(TokenCounter);
                             assert.equal(TokenURI.toString().includes("ipfs://"), true);
                             assert.equal(TokenCounter.toString(), "1");
                             resolve();
@@ -106,8 +105,9 @@ const { rejects } = require("assert");
                             await gachaContract.payCase({ value: fee.toString() });
                         }
                         openCaseResponse = await gachaContract.openCase();
+                        openCaseResponse2 = await gachaContract.openCase();
                         openCaseReceipt = await openCaseResponse.wait(1);
-
+                        // console.log(openCaseReceipt.logs[1].topics[0]);
                         await mockContract.fulfillRandomWords(
                             openCaseReceipt.events[1].args[0],
                             gachaContract.address
