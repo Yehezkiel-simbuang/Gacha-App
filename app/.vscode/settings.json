@@ -1,0 +1,15 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "notebook.formatOnCellExecution": true,
+    "notebook.formatOnSave.enabled": true,
+    "prettier.prettierPath": "./node_modules/prettier",
+    "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+    "javascript.format.enable": true,
+    "[solidity]": {
+      "editor.defaultFormatter": "JuanBlanco.solidity"
+    }
+}
