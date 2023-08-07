@@ -25,3 +25,7 @@ yarn run dev
 ![App](imgRM/test2.png)
 
 I will update the UI soon :)
+
+# Note
+
+The web runs using a hardhat network.
