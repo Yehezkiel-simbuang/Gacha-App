@@ -2,7 +2,6 @@ import Head from "next/head";
 
 import Header from "../component/Header";
 import Buy from "@/component/Buy";
-import Open from "@/component/Open";
 import { useMoralis } from "react-moralis";
 
 const supportedChains = ["31337", "11155111"]
