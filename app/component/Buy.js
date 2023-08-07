@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useWeb3Contract, useMoralis } from "react-moralis";
 import { useNotification } from "web3uikit";
-import { contractAddresses, abi, abiVRF, contractAddressesVRF } from "../constants";
+import { contractAddresses, abi, abiVRF } from "../constants";
 import { ethers } from "ethers";
 
 export default function Buy() {
     const { chainId: chainIdHex, account, isWeb3Enabled } = useMoralis();
     const chainId = parseInt(chainIdHex);
     const gachaAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
-    const MockVRFaddress = chainId in contractAddresses ? contractAddresses[chainId][1] : null
+    const mockAddress = chainId in contractAddresses ? contractAddresses[chainId][1] : null
     const [casePrice, setCasePrice] = useState("0");
     const [numCase, setNumCase] = useState("0");
-    const [reqID, setReqID] = useState(0);
-    const [tokenCount, setTokenCount] = useState(0);
+    const [tokenCount, setTokenCount] = useState("");
+    const [reqID, setReqId] = useState("");
+    const [result, setResult] = useState("");
 
     const dispatch = useNotification();
 
     //1. Call function from smartcontract
 
-    const { runContractFunction: payCase, data: enterTxResponse } = useWeb3Contract(
+    const { runContractFunction: payCase } = useWeb3Contract(
         {
             abi: abi,
             contractAddress: gachaAddress,
@@ -27,7 +28,7 @@ export default function Buy() {
             params: {},
         }
     )
-    const { runContractFunction: openCase, isLoading, isFetching } = useWeb3Contract(
+    const { runContractFunction: openCase, data, isLoading, isFetching } = useWeb3Contract(
         {
             abi: abi,
             contractAddress: gachaAddress,
@@ -36,14 +37,12 @@ export default function Buy() {
         }
     )
 
-    const { runContractFunction: fulfillRandomWords } = useWeb3Contract(
-        {
-            abi: abiVRF,
-            contractAddress: MockVRFaddress,
-            functionName: "fulfillRandomWords",
-            params: { _requestId: "3", _consumer: gachaAddress },
-        }
-    )
+    const { runContractFunction: fulfillRandomWords } = useWeb3Contract({
+        abi: abiVRF,
+        contractAddress: mockAddress,
+        functionName: "fulfillRandomWords",
+        params: { _requestId: reqID, _consumer: gachaAddress }
+    })
 
     const { runContractFunction: getTokenCounter } = useWeb3Contract({
         abi: abi,
@@ -70,7 +69,7 @@ export default function Buy() {
         abi: abi,
         contractAddress: gachaAddress,
         functionName: "tokenURI",
-        params: { tokenId: tokenCount },
+        params: { tokenId: tokenCount - 1 },
     })
 
     async function updateValue() {
@@ -79,6 +78,11 @@ export default function Buy() {
         const totalCase = Number((await getNumCase())._hex);
         setNumCase(totalCase);
     }
+
+    // function getRID() {
+    //     useEffect(() => {
+    //     }, [reqID]);
+    // }
 
     useEffect(() => {
         if (isWeb3Enabled) {
@@ -108,19 +112,24 @@ export default function Buy() {
     const handleSuccess_open = async (tx) => {
         try {
             const txResponse = await tx.wait(1);
-            const RID = txResponse.events[1].args[0];
-            setReqID(RID);
+            const RID = Number((txResponse.events[1].args[0])._hex).toString();
+            setReqId(RID);
+            console.log(reqID);
+            // getRID();
             await fulfillRandomWords();
-            const token = await getTokenCounter().toString();
-            setTokenCount(token);
+            const token = await getTokenCounter();
+            setTokenCount(token.toString());
+            console.log(tokenCount);
             const _tokenURI = await tokenURI();
-            console.log(_tokenURI);
+            setResult(_tokenURI);
             updateValue();
-            newNotification(tx)
         } catch (error) {
             console.log(error)
         }
     }
+
+    useEffect(() => {
+    }, [tokenCount]);
 
     return (
         <div className="p-5">
@@ -146,7 +155,7 @@ export default function Buy() {
                     <button
                         onClick={async () =>
                             await openCase({
-                                // onComplete:
+                                // onComplete:,
                                 // onError:
                                 onSuccess: handleSuccess_open,
                                 onError: (error) => console.log(error),
@@ -163,10 +172,12 @@ export default function Buy() {
                     <div>Case price: {ethers.utils.formatUnits(casePrice, "ether")} ETH</div>
 
                     <div>Case that the player has is: {numCase}</div>
+                    <div>Result: {result}</div>
                 </>
             ) : (
                 <div>Please connect to a supported chain </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     )
 }
