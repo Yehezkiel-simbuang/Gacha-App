@@ -11,9 +11,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 */
 contract Gacha is VRFConsumerBaseV2, ERC721URIStorage {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
-
     string[12] internal itemTokenURI;
     string[12] private caseItem = [
         "Rare sword",
@@ -35,6 +32,7 @@ contract Gacha is VRFConsumerBaseV2, ERC721URIStorage {
     VRFCoordinatorV2Interface private immutable vrfCoordinator;
     mapping(address => uint256) private numCase;
     mapping(uint256 => address) private requestToSender;
+    uint256 private tokenIds;
 
     //Request random words variable
     bytes32 private immutable keyHash;
@@ -109,10 +107,10 @@ contract Gacha is VRFConsumerBaseV2, ERC721URIStorage {
         address itemOwner = requestToSender[requestId];
         uint256 idxItem = randomWords[0] % caseItem.length;
 
-        uint256 newItemId = _tokenIds.current();
+        uint256 newItemId = tokenIds;
+        tokenIds = tokenIds + 1;
         _safeMint(itemOwner, newItemId);
         _setTokenURI(newItemId, itemTokenURI[idxItem]);
-        _tokenIds.increment();
         emit Item_minted(caseItem[idxItem], itemOwner);
     }
 
@@ -145,7 +143,7 @@ contract Gacha is VRFConsumerBaseV2, ERC721URIStorage {
         return requestToSender[idx];
     }
 
-    function getTokenCounter() public view returns (Counters.Counter memory) {
-        return _tokenIds;
+    function getTokenCounter() public view returns (uint256) {
+        return tokenIds;
     }
 }
