@@ -1,13 +1,27 @@
-# Sample Hardhat Project
+# Gacha App
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Implementation of a gacha smart contract (obtaining item image with a certain probability) using chainlink VRF.
 
-Try running some of the following tasks:
+## Requirement
+Before running the command below, make sure that you have installed metamask and ipfs extension.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
+## Quickstart
 ```
+git clone https://github.com/Yehezkiel-simbuang/Gacha-App
+cd Gacha-App/
+yarn
+yarn hardhat node
+```
+After running the command above, copy one of the private keys and import it to metamask. And after that,
+open new terminal, and run the command below
+```
+cd app/
+yarn
+yarn run dev
+```
+## Web
+![App](imgRM/test.png)
+![App](imgRM/test1.png)
+![App](imgRM/test2.png)
+
+I will update the UI soon :)
