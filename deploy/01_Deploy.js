@@ -3,7 +3,7 @@ const { NetworkConfig } = require("../helper-hardhat-config");
 const { storeItem, storeMetadata } = require("../utils/PinataUpload");
 const { verify } = require("../utils/verify");
 
-const FUND_AMOUNT = ethers.utils.parseEther("200");
+const FUND_AMOUNT = ethers.utils.parseEther("300");
 const imagesPath = "./Images/";
 // const metadata = {
 //     name: "",
@@ -41,8 +41,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         const txResponse = await MockVRF.createSubscription();
         const txReceipt = await txResponse.wait(1);
         subscriptionId = txReceipt.events[0].args.subId;
-        const test = await MockVRF.fundSubscription(subscriptionId, FUND_AMOUNT);
-        console.log(test);
+        await MockVRF.fundSubscription(subscriptionId, FUND_AMOUNT);
     } else {
         VRFAddress = NetworkConfig[chainID]["vrfCoordinatorV2"];
         subscriptionId = NetworkConfig[chainID]["subscriptionId"];
@@ -62,7 +61,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         args: arg,
         log: true,
     });
-    console.log(deploy_gacha.address);
     // console.log(arg);
     if (chainID == 31337) {
         await MockVRF.addConsumer(subscriptionId, deploy_gacha.address);
